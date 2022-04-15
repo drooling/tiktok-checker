@@ -24,11 +24,9 @@ THREAD_LOCK = Lock()
 
 
 def ensure_outfile() -> None:
-    global OUTPUT_FILE
     if not os.path.exists("./results"):
         os.mkdir("./results")
         open("./results/available.txt", 'w')
-    OUTPUT_FILE = open("./results/available.txt", 'a')
 
 
 def output_available(result: tuple[str, int]) -> None:
@@ -36,7 +34,11 @@ def output_available(result: tuple[str, int]) -> None:
     THREAD_LOCK.acquire()
     if (status == 404):
         print(f"[ {Fore.LIGHTGREEN_EX}AVAILABLE {Fore.RESET}] -> {username}")
-        OUTPUT_FILE.write(str(username + '\n'))
+        with open("./results/available.txt", 'a') as of:
+            of.write(str(username + '\n'))
+            of.close()
+    elif (status == 403):
+        print(f"[ {Fore.LIGHTRED_EX}RATE LIMIT {Fore.RESET}] -> {username}")
     else:
         print(f"[ {Fore.LIGHTRED_EX}UNAVAILABLE {Fore.RESET}] -> {username}")
     THREAD_LOCK.release()
@@ -68,5 +70,5 @@ if __name__ == "__main__":
     WORDLIST = (parser.parse_args()).wordlist
     THREADS = int(
         input(f"[{Fore.LIGHTBLUE_EX} Worker Count {Fore.RESET}] -> "))
-    THREADS = 20 if THREADS >= 100 else THREADS
+    THREADS = 7 if THREADS >= 7 else THREADS # Avoid rate limits to keep proxyless
     asyncio.run(start())
