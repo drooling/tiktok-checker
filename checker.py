@@ -2,6 +2,7 @@ import argparse
 import asyncio
 import contextlib
 import os
+import sys
 from concurrent.futures import ThreadPoolExecutor
 from threading import Lock
 
@@ -33,12 +34,12 @@ def output_available(result: tuple[str, int]) -> None:
     username, status = result
     THREAD_LOCK.acquire()
     if (status == 404):
-        print(f"[ {Fore.LIGHTGREEN_EX}AVAILABLE {Fore.RESET}] -> {username}")
+        print(f"[  {Fore.LIGHTGREEN_EX}AVAILABLE  {Fore.RESET}] -> {username}")
         with open("./results/available.txt", 'a') as of:
             of.write(str(username + '\n'))
             of.close()
     elif (status == 403):
-        print(f"[ {Fore.LIGHTRED_EX}RATE LIMIT {Fore.RESET}] -> {username}")
+        print(f"[  {Fore.LIGHTRED_EX}RATELIMIT  {Fore.RESET}] -> {username}")
     else:
         print(f"[ {Fore.LIGHTRED_EX}UNAVAILABLE {Fore.RESET}] -> {username}")
     THREAD_LOCK.release()
@@ -64,11 +65,10 @@ async def start() -> None:
                 executor.submit(check_user, sublist, session)
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(
-        "TikTok Username Checker", description="github.com/9sv")
+    parser = argparse.ArgumentParser(sys.argv[0], description="github.com/9sv")
     parser.add_argument("wordlist", action="store")
     WORDLIST = (parser.parse_args()).wordlist
     THREADS = int(
         input(f"[{Fore.LIGHTBLUE_EX} Worker Count {Fore.RESET}] -> "))
-    THREADS = 7 if THREADS >= 7 else THREADS # Avoid rate limits to keep proxyless
+    THREADS = 5 if THREADS >= 5 else THREADS  # Avoid rate limits to keep proxyless
     asyncio.run(start())
