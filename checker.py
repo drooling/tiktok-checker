@@ -65,7 +65,7 @@ async def start() -> None:
                 executor.submit(check_user, sublist, session)
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(sys.argv[0], description="github.com/9sv")
+    parser = argparse.ArgumentParser(sys.argv[0], description="github.com/drooling")
     parser.add_argument("wordlist", action="store")
     WORDLIST = (parser.parse_args()).wordlist
     THREADS = int(
